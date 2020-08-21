@@ -1,0 +1,406 @@
+﻿
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@using yiran.Areas.Admin.Models.Entity
+<body>
+    <style>
+        .layui-layer-page.layui-layer {
+            font-size: 0;
+            background-color: transparent;
+        }
+    </style>
+    <div class="x-nav">
+        <span class="layui-breadcrumb">
+            <a>首页</a>
+            <a class="p_name"></a>
+            <a>
+                <cite class="c_name"></cite>
+            </a>
+        </span>
+        <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" onclick="location.reload()" title="刷新">
+            <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i>
+        </a>
+    </div>
+    <div class="layui-fluid">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-body layui-table-body layui-table-main">
+                        <div class="layui-tab layui-tab-card">
+                            <div class="layui-tab-content">
+                                <div class="layui-tab-item layui-show">
+                                    <div class="layui-card-body " style="padding-left:0">
+                                        <form class="layui-form layui-col-space5">
+                                            <div class="layui-inline layui-show-xs-block">
+                                                <input class="layui-input" autocomplete="off" placeholder="开始日期" name="start" id="start">
+                                            </div>
+                                            <div class="layui-inline layui-show-xs-block">
+                                                <input class="layui-input" autocomplete="off" placeholder="截止日期" name="end" id="end">
+                                            </div>
+                                            <div class="layui-inline layui-show-xs-block">
+                                                <input type="text" name="keywork" placeholder="名称/手机/邮箱" autocomplete="off" class="layui-input">
+                                            </div>
+                                            <input type="hidden" name="Static" value="0" />
+                                            <div class="layui-inline layui-show-xs-block">
+                                                <button class="layui-btn submit" lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="layui-card-header" style="padding-bottom:10px;margin-bottom:15px;padding-left:0">
+                                        @if ((ViewData["menu"] as List<sys_menu>).Where(c => c.action == "delform").Any())
+                                        {
+                                            <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除</button>
+                                        }
+                                        @if ((ViewData["menu"] as List<sys_menu>).Where(c => c.action == "eaitform").Any())
+                                        {
+                                            <button class="layui-btn " onclick="showAll()"><i class="icon iconfont">&#xe6e6;</i> 批量设置已查看</button>
+                                        }
+                                    </div>
+                                    <div class="layui-tab layui-tab-card">
+                                        <ul class="layui-tab-title">
+                                            <li>全部</li>
+                                            <li>未查看</li>
+                                            <li>已查看</li>
+                                            <li>已回复</li>
+                                        </ul>
+                                    </div>
+                                    <div style="overflow-x:auto;width:100%">
+                                        <table class="layui-table layui-form">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        <input title="全选" type="checkbox" lay-filter="checkall" name="" lay-skin="primary">
+                                                    </th>
+                                                    <th>名称</th>
+                                                    <th>手机</th>
+                                                    <th>邮箱</th>
+                                                    <th>地址</th>
+                                                    <th>留言</th>
+                                                    <th>留言时间</th>
+                                                    <th>状态</th>
+                                                    <th>操作</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+
+                                                @if (Model.data.Count >= 1)
+                                                {
+                                                    var i = 0;
+                                                    foreach (var m in Model.data)
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <input type="checkbox" data-Static="@m.Static" name="id" title="@(i = i + 1)" value="@m.id" lay-skin="primary">
+                                                            </td>
+                                                            <td>@m.name</td>
+                                                            <td>@m.phone</td>
+                                                            <td><a href="mailto:@m.email" style="text-decoration:underline">@m.email</a></td>
+                                                            <td>@m.ress</td>
+                                                            <td>@m.msg</td>
+                                                            <td>@m.addtime.ToString("yyyy/MM/dd HH:mm:ss")</td>
+                                                            <td>
+                                                                @if (m.Static == 0)
+                                                                {
+                                                                    <span class="x-red">未查看</span>
+                                                                    @if ((ViewData["menu"] as List<sys_menu>).Where(c => c.action == "eaitform").Any())
+                                                                    {
+                                                                        <a title="标记已查看" onclick="show(this,'@m.id')" href="javascript:;" style="display:block">
+                                                                            <i class="icon iconfont">&#xe6e6;</i>
+                                                                            标记已查看
+                                                                        </a>
+                                                                    }
+                                                                }
+                                                                else if (m.Static == 1)
+                                                                {
+                                                                    <button type="button" class="layui-btn  layui-btn-danger">已查看，未回复</button>
+
+                                                                }
+                                                                else if (m.Static == 2)
+                                                                {
+                                                                    <button type="button" class="layui-btn">已回复</button>
+                                                                }
+                                                                @if (!string.IsNullOrEmpty(@m.remark))
+                                                                {
+                                                                    <p class="x-red">@m.remark By:@m.uname</p>
+                                                                }
+                                                            </td>
+                                                            <td class="td-manage">
+                                                                @if ((ViewData["menu"] as List<sys_menu>).Where(c => c.action == "subform").Any())
+                                                                {
+                                                                    <a title="回复" onclick="xadmin.open('回复','@Url.Action("Subform", "Form", new { area = "Admin", id = @m.id })',700,700)" href="javascript:;">
+                                                                        <i class="layui-icon">&#xe611;</i>
+                                                                    </a>
+                                                                }
+                                                                @if ((ViewData["menu"] as List<sys_menu>).Where(c => c.action == "delform").Any())
+                                                                {
+                                                                    <a title="删除" style="margin-left:5px;" onclick="member_del(this,'@m.id')" href="javascript:;">
+                                                                        <i class="layui-icon">&#xe640;</i>
+                                                                    </a>
+                                                                }
+
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <tr>
+                                                        <td colspan="9" align="center">暂无数据</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                        <div class="layui-card-body ">
+                                        <div class="page">
+                                            <style>
+                                                .pagination {
+                                                    font-size: 0;
+                                                    margin-bottom: 25px;
+                                                }
+
+                                                    .pagination .click {
+                                                        cursor: pointer
+                                                    }
+
+                                                    .pagination a {
+                                                        text-decoration: none;
+                                                        border: 1px solid #009688;
+                                                        color: #009688;
+                                                        font-size: 13px;
+                                                        border-radius: 2px;
+                                                        margin: 0 4px;
+                                                    }
+
+                                                    .pagination span {
+                                                        color: #666;
+                                                        font-size: 13px;
+                                                        display: inline-block;
+                                                        border: 1px solid #ccc;
+                                                        padding: 0.2em 0.6em;
+                                                        margin: 0 4px;
+                                                    }
+
+                                                        .pagination span.pagetext {
+                                                            border: none
+                                                        }
+
+                                                    .pagination a:hover {
+                                                        background: #009688;
+                                                        color: #fff;
+                                                    }
+
+                                                    .pagination a {
+                                                        display: inline-block;
+                                                        padding: 0.2em 0.6em;
+                                                    }
+
+                                                    .pagination .page_current {
+                                                        background: #009688;
+                                                        color: #fff;
+                                                        border: 1px solid #009688;
+                                                        margin-right: 5px;
+                                                    }
+
+                                                .pagination {
+                                                    margin-top: 20px;
+                                                }
+
+                                                    .pagination .current.prev, .pagination .current.next {
+                                                        color: #999;
+                                                        border-color: #999;
+                                                        background: #fff;
+                                                    }
+                                            </style>
+                                            @Html.Raw(ViewData["page"])
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="layui-card-body ">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    layui.use(['laydate', 'form','element'], function () {
+        var laydate = layui.laydate;
+        var form = layui.form;
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#start' //指定元素
+            ,value:getUrlQuery("start") ? getUrlQuery("start")  : ""
+        });
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#end' //指定元素
+            ,value:getUrlQuery("end") ? getUrlQuery("end")  : ""
+        });
+        $("input[name=keywork]").val(getUrlQuery("keywork") ? getUrlQuery("keywork") : "");
+        if (getUrlQuery("Static")) {
+            $(".layui-tab-title li").eq(getUrlQuery("Static")).addClass("layui-this").siblings().removeClass("layui-this")
+             $("input[name = Static]").val($(this).index());
+        } else {
+            $(".layui-tab-title li").eq(0).addClass("layui-this").siblings().removeClass("layui-this")
+        }
+        // 监听全选
+        form.on('checkbox(checkall)', function(data){
+          if(data.elem.checked){
+            $('.layui-show tbody input[name = id]').prop('checked',true);
+          }else{
+            $('.layui-show tbody input[name = id]').prop('checked',false);
+          }
+          form.render('checkbox');
+        });
+
+    });
+
+    $(".layui-tab-title li").click(function () {
+        $("input[name = Static]").val($(this).index());
+        $(".submit").click();
+    })
+
+    @if ((ViewData["menu"] as List<sys_menu>).Where(c => c.action == "delform").Any())
+    {
+        <text>
+            /*用户-删除*/
+            function member_del(obj,id){
+                  layer.confirm('确认要删除吗？',function(index){
+                      //发异步删除数据
+                      $.ajax({
+                        url: '@Url.Content("/Admin/Form/Delform")',
+                        type: 'POST',
+                        data: { id: id},
+                        dataType: 'json',
+                        async: true,
+                        success: function (data, status, xhr) {
+                            if (data.code == 200) {
+                                layer.msg(data.result, {
+                                    icon: 1,
+                                    time: 2000
+                                }, function(){
+                                    location.reload();
+                                });
+                            } else {
+                                layer.msg(data.result, { icon: 2 });
+                            }
+                        }
+			          });
+                      //$(obj).parents("tr").remove();
+                      //layer.msg('已删除!',{icon:1,time:1000});
+                  });
+    }
+    function delAll (argument) {
+        var ids = [];
+
+        // 获取选中的id
+        $('.layui-show tbody input[name = id]').each(function(index, el) {
+            if($(this).prop('checked')){
+                ids.push($(this).val())
+            }
+
+        });
+         if (ids.length @Html.Raw("<")= 0) {
+             layer.msg("请选择要删除的行", { icon: 2, time: 2000 });
+             return false;
+         }
+         layer.confirm('确认要删除吗？', function (index) {
+             $.ajax({
+                 url: '@Url.Content("/Admin/Form/Delform")',
+                 type: 'POST',
+                 data: { id:ids },
+				dataType: 'json',
+				async: true,
+                success: function (data, status, xhr) {
+                    if (data.code == 200) {
+                        layer.msg(data.result, {
+                            icon: 1,
+                            time: 2000
+                        }, function(){
+                            location.reload();
+                        });
+                    } else {
+                        layer.msg(data.result, { icon: 2 });
+                    }
+				}
+			});
+        });
+    }
+        </text>
+    }
+    @if ((ViewData["menu"] as List<sys_menu>).Where(c => c.action == "eaitform").Any())
+    {
+    <text>
+    function showAll() {
+        var ids = [];
+
+        // 获取选中的id
+        $('.layui-show tbody input[name = id]').each(function (index, el) {
+            if ($(this).prop('checked') && $(this).attr("data-Static") == 0) {
+                ids.push($(this).val())
+            }
+        });
+         if (ids.length @Html.Raw("<")= 0) {
+             layer.msg("请选择未查看的行", { icon: 2, time: 2000 });
+             return false;
+         }
+         layer.confirm('确认要标记已查看嘛？', function (index) {
+             $.ajax({
+                 url: '@Url.Content("/Admin/Form/ShowForm")',
+                 type: 'POST',
+                 data: { id:ids },
+				dataType: 'json',
+				async: true,
+                success: function (data, status, xhr) {
+                    if (data.code == 200) {
+                        layer.msg(data.result, {
+                            icon: 1,
+                            time: 2000
+                        }, function(){
+                            location.reload();
+                        });
+                    } else {
+                        layer.msg(data.result, { icon: 2 });
+                    }
+				}
+			});
+        });
+    }
+    function show(obj, id) {
+        layer.confirm('确认要标记已查看嘛？', function (index) {
+            $.ajax({
+                url: '@Url.Content("/Admin/Form/ShowForm")',
+                type: 'POST',
+                data: {id:id},
+				dataType: 'json',
+				async: true,
+                success: function (data, status, xhr) {
+                    if (data.code == 200) {
+                        layer.msg(data.result, {
+                            icon: 1,
+                            time: 2000
+                        }, function(){
+                            location.reload();
+                        });
+                    } else {
+                        layer.msg(data.result, { icon: 2 });
+                    }
+				}
+			});
+        });
+    }
+
+    </text>
+    }
+
+
+</script>

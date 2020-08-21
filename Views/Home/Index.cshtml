@@ -1,0 +1,267 @@
+﻿@{
+    Layout = "_Layout";
+}
+@model HomeViewModel
+<div id="app">
+    @await Html.PartialAsync("_right_menu", @Model.common)
+    <!-- right_menu end -->
+    @await Html.PartialAsync("_header", @Model.common)
+    <!-- header end -->
+    <div class="pc_banner swiper-container">
+        <div class="swiper-wrapper">
+            @foreach (var pcb in Model.banner.Where(c => c.type == 1).ToList())
+            {
+                <div class="swiper-slide">
+
+                    <a @(!string.IsNullOrEmpty(pcb.href) ? "href=" + pcb.href : "") target="_blank">
+                        <img class="swiper-lazy" data-src="@pcb.image">
+                    </a>
+                </div>
+            }
+        </div>
+        <div class="banner_page"></div>
+    </div>
+    <!-- pc_banner end -->
+    <!-- PC版banner图 -->
+    <div class="media_banner swiper-container">
+        <div class="swiper-wrapper">
+            @foreach (var mb in Model.banner.Where(c => c.type == 2).ToList())
+            {
+                <div class="swiper-slide">
+
+                    <a @(!string.IsNullOrEmpty(mb.href) ? "href=" + mb.href : "") target="_blank">
+                        <img class="swiper-lazy" data-src="@mb.image">
+                    </a>
+                </div>
+            }
+        </div>
+        <div class="banner_page"></div>
+    </div>
+    <!-- media_banner end -->
+    <!-- 手机端banner图 -->
+
+    <div class="main">
+        <div id="page1" style="position:relative;top:-80px"></div>
+        <div class="section wow yrani fadeInUp_qs50" data-wow-duration="1s" data-wow-delay="300ms">
+            <div class="w1200">
+                <div class="title mb25">
+                    <div class="cn">@Model.about.cn_title</div>
+                    <div class="en">@Model.about.en_title</div>
+                </div>
+                <div class="word">
+                    @Html.Raw(Model.about.content)
+                </div>
+            </div>
+        </div>
+        <!-- section page1 end -->
+        <div id="page2" style="position:relative;top:-80px"></div>
+        <div class="section bg1 wow yrani fadeInUp_qs50" data-wow-duration="1s" data-wow-delay="300ms">
+            <div class="w1200">
+                <div class="title2 mb15">
+                    <div class="cn">@Model.product.cn_title</div>
+                    <div class="en">@Model.product.en_title</div>
+                </div>
+                <div class="tc fz18 colfff lh40 word">
+                    @Model.product.content
+                </div>
+
+                <div class="page2_swiper swiper-container">
+                    <div class="swiper-wrapper">
+                        @foreach (var p in Model.prouduct_list)
+                        {
+                            <div class="swiper-slide">
+                                <a href="/Home/Details/@p.id" class="product_li hoverText">
+                                    <div class="img">
+                                        <img src="@p.image[0]" class="img100 guodu">
+                                    </div>
+                                    <p class="guodu">@p.title</p>
+                                </a>
+                            </div>
+                        }
+
+                    </div>
+                    <div class="page2_swiper_btn clearfix">
+                        <img src="images/btn1.png" class="btn1">
+                        <img src="images/btn2.png" class="btn2">
+                    </div>
+                </div>
+
+                <div class="tc f24 col0097e0">(详细技术参数请咨询客服，如有特定的设备及规格，我司可提供优化组合方案)</div>
+            </div>
+        </div>
+        <!-- section page2 -->
+
+        <div class="section bg2 wow yrani fadeInUp_qs50" data-wow-duration="1s" data-wow-delay="300ms" id="page3">
+            <div class="title mb25">
+                <div class="cn">@Model.support.cn_title</div>
+                <div class="en">@Model.support.en_title</div>
+            </div>
+            <div class="w1200 clearfix service">
+                @foreach (var s in Model.support_list)
+                {
+                    <div class="col-3 service_li">
+                        <img src="@s.icon">
+                        <div class="text">
+                            <h1>@s.title</h1>
+                            <p class="word">@s.content</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div id="page4" style="position:relative;top:-80px"></div>
+        <div class="section bg3 wow yrani fadeInUp_qs50" data-wow-duration="1s" data-wow-delay="300ms">
+            <div class="title mb25">
+                <div class="cn">@Model.field.cn_title</div>
+                <div class="en">@Model.field.en_title</div>
+            </div>
+            <div class="w1200">
+                <div class="word tc f18 col333 lh2b pt20 pb30">
+                    @Model.field.content
+                </div>
+                <div class="clearfix field">
+                    @foreach (var f in Model.field_list)
+                    {
+                        <div class="field_li ">
+                            <a @(!string.IsNullOrEmpty(f.href) ? "href=" + f.href : "")>
+                                <div class="img">
+                                    <img src="@f.image" class="img100 guodu">
+                                </div>
+                                <p class="mt17" style="color:#333">@f.title</p>
+
+                            </a>
+                        </div>
+                    }
+
+
+                </div>
+            </div>
+        </div>
+        <div id="page5" style="position:relative;top:-80px"></div>
+        <div class="section bg4 wow yrani fadeInUp_qs50" data-wow-duration="1s" data-wow-delay="300ms">
+            <div class="w1200">
+                <div class="title2 mb35">
+                    <div class="cn">我要加盟</div>
+                    <div class="en">Join Us </div>
+                </div>
+                <div class="form">
+                    <form id="form">
+                        <input forms="required" type="text" class="inputstyle1 mb10" placeholder="您的姓名" name="name" id="" value="" />
+                        <input forms="required phone" type="text" class="inputstyle1 mb10" placeholder="您的手机号码" name="phone" id="" value="" />
+                        <input forms="required" type="text" class="inputstyle1 mb10" placeholder="您的地址" name="ress" id="" value="" />
+                        <input forms="required email" type="text" class="inputstyle1 mb10" placeholder="您的邮箱" name="email" id="" value="" />
+                        <textarea forms="required" placeholder="您的留言" name="msg" class="textarea mb15"></textarea>
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btnstyle1">提交</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- section page2 -->
+    </div>
+    <!-- main end -->
+    @await Html.PartialAsync("_footer", @Model.common)
+    <!-- footer end -->
+
+</div>
+<!-- app end -->
+
+<script type="text/javascript">
+			$("#form").form({
+				options:{
+					Ajax:true,
+					scroll:false,
+					blur:false
+				},
+				done:function(){
+					$(".btnstyle1").attr("disabled","disabled")
+                    $.ajax({
+                        url: "@Url.Action("AddJoin","Home")",
+                        type: 'post',
+                        data: $("form").serializeArray(),
+					    async:false,
+					    dataType:'json',
+					    success: function(data){
+                            if (data.code == 200) {
+                                $("form")[0].reset();
+                            }
+                            alert(data.result)
+                        },
+                        complete: function () {
+                            $(".btnstyle1").removeAttr("disabled")
+                        }
+				    });
+				}
+			})
+			// 表单提交
+
+			sendBanner();
+			$(window).resize(function(){
+				sendBanner()
+			})
+			//加载不同的banner
+			function sendBanner(){
+				if(getMedia()){
+					new Swiper('.pc_banner',{
+						speed:600,
+						loop:true,
+						lazyLoading : true,
+						lazyLoadingInPrevNext : true,
+						lazyLoadingInPrevNextAmount : 2,
+						pagination : '.pc_banner .banner_page',
+						paginationClickable :true,
+					})
+				}else{
+					new Swiper('.media_banner',{
+						speed:600,
+						loop:true,
+						lazyLoading : true,
+						lazyLoadingInPrevNext : true,
+						lazyLoadingInPrevNextAmount : 2,
+						pagination : '.media_banner .banner_page',
+						paginationClickable :true,
+					})
+				}
+			}
+
+			var slidesPerView = 4;
+			if(!getMedia()){
+				slidesPerView = 2.5
+			}
+			//关于我们
+			var about_Swiper = new Swiper('.page2_swiper', {
+				slidesPerView : slidesPerView,
+				spaceBetween : 20,
+				prevButton:'.btn1',
+				nextButton:'.btn2',
+			})
+
+			//页面滚动
+			var pageIndex = getUrlQuery("page");
+			$(function(){
+				if(pageIndex){
+					var pdtop = Number($("#page"+pageIndex).css("padding-top").replace('px',''));
+					var offsetTop = $("#page"+pageIndex).offset().top - $(".header").height();
+					$("body,html").animate({
+						"scrollTop":offsetTop
+					})
+				}
+			})
+			$(".header .nav a").click(function(){
+				setTimeout(function(){
+					var idx = getpageQuery(window.location.hash,"page");
+					var pdp = Number($("#page"+idx).css("padding-top").replace('px',''));
+					var oTp = $("#page"+idx).offset().top - $(".header").height();
+					$("body,html").animate({
+						"scrollTop":oTp
+					})
+				},100)
+            })
+
+$('.word').each(function () {
+	var txt = $.trim($(this).html());
+	$(this).html(txt.replace(/[\n\r]/g,'<br>'));
+});
+</script>
+

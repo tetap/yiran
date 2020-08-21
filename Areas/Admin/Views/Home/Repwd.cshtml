@@ -1,0 +1,103 @@
+﻿
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<body>
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <form class="layui-form" lay-filter="example">
+                <div class="layui-form-item">
+                    <label for="username" class="layui-form-label">
+                        <span class="x-red">*</span>
+                        旧密码
+                    </label>
+                    <div class="layui-input-inline">
+                        <input style="height:38px;" required lay-verify="required" value="" type="password" name="oldpwd" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label for="username" class="layui-form-label">
+                        <span class="x-red">*</span>
+                        新密码
+                    </label>
+                    <div class="layui-input-inline">
+                        <input style="height:38px;" required lay-verify="required" id="L_pass" value="" type="password" name="newpwd" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label for="username" class="layui-form-label">
+                        <span class="x-red">*</span>
+                        确认密码
+                    </label>
+                    <div class="layui-input-inline">
+                        <input style="height:38px;" required lay-verify="repass" id="L_repass" value="" type="password" name="repwd" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                @Html.AntiForgeryToken()
+                <div class="layui-form-item" style="margin-top:20px">
+                    <button class="layui-btn layui-btn-lg" lay-filter="add" style="display:block;margin:auto" lay-submit="">
+                        修改
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        layui.use(['form', 'layer','element','upload'],
+
+            function() {
+                $ = layui.jquery;
+                var form = layui.form,
+                    layer = layui.layer,
+                    upload = layui.upload;
+                //自定义验证规则
+                form.verify({
+                    repass: function(value) {
+                        if ($('#L_pass').val() != $('#L_repass').val()) {
+                            return '两次密码不一致';
+                        }
+                    }
+                });
+                //监听提交
+                form.on('submit(add)',
+                    function (data) {
+                        var index = layer.load(1);
+                        var dataf = data.field;
+                    $.ajax({
+                        url: '@Url.Action("Repwd","Home",new { area="Admin"})',
+                        data: dataf,
+			            type: "post",
+			            async:true,
+			            dataType: 'json',
+                        success: function (data) {
+                            if (data.code == 200) {
+                                //发异步，把数据提交给php
+                                layer.msg(data.result, function () {
+                                    //关闭当前frame
+                                    xadmin.close();
+                                    // 可以对父窗口进行刷新
+                                    parent.location.replace("/admin/login")
+                                });
+                            } else {
+                                 layer.msg(data.result, { icon: 0, time: 2000 });
+                            }
+                        },
+			            error:function(xhr,errorText,errorType){
+                             alert("error");
+                        },
+			            complete : function(XMLHttpRequest,status){ //请求完成后最终执行参数
+				            if(status=='timeout'){
+					            ajax.abort();
+					            alert("请求超时");
+                            }
+                            layer.close(index);
+			            }
+		            })
+
+                    return false;
+                });
+
+            });
+    </script>
+</body>

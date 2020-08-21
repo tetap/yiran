@@ -1,0 +1,125 @@
+﻿
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<body>
+    @using yiran.Areas.Admin.Models.Entity
+    @model sys_user
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <form class="layui-form">
+                <div class="layui-form-item">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="id" value="@Model.id" name="id" required="" lay-verify="required"
+                           autocomplete="off" class="layui-input">
+                    <label for="username" class="layui-form-label">
+                        <span class="x-red">*</span>昵称
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" id="username" name="name" value="@Model.name" required="" lay-verify="required"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+
+
+                <div class="layui-form-item">
+                    <label for="username" class="layui-form-label">
+                        角色
+                    </label>
+                    <div class="layui-input-block">
+
+                        @foreach (var r in ViewData["role"] as List<sys_role>)
+                        {
+                            @if (Array.IndexOf(Model.role_id.Split(",", StringSplitOptions.RemoveEmptyEntries).Distinct().ToArray(), @r.id.ToString()) != -1)
+                            {
+                                <input type="checkbox" checked name="role_id" value="@r.id" title="@r.name">
+                            }
+                            else
+                            {
+                                <input type="checkbox" name="role_id" value="@r.id" title="@r.name">
+                            }
+
+                        }
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label for="username" class="layui-form-label">
+                        状态
+                    </label>
+                    <div class="layui-input-inline" style="line-height:36px">
+                        <input type="checkbox" name="Static" lay-skin="switch" @(Model.Static == 1 ? "checked" : "") lay-text="启用|关闭">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label for="username" class="layui-form-label">
+                        备注
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" id="username" name="remark" value="@Model.remark"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label for="L_repass" class="layui-form-label">
+                    </label>
+                    <button class="layui-btn" lay-filter="add" lay-submit="">
+                        修改
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        layui.use(['form', 'layer'],
+            function () {
+                $ = layui.jquery;
+                var form = layui.form,
+                    layer = layui.layer;
+
+                //监听提交
+                form.on('submit(add)',
+                    function (data) {
+                        var fdata = data.field;
+                        if (fdata["Static"] == "on") {
+                            fdata["Static"] = 1;
+                        } else {
+                            fdata["Static"] = 0;
+                        }
+                        fdata["role_id"] = "";
+                        $("input[name = role_id]:checked").each(function () {
+                            fdata["role_id"] += $(this).val() + ","
+                        })
+                        fdata["role_id"] = fdata["role_id"].substring(0, fdata["role_id"].length - 1)
+                        $.ajax({
+                            url: '/Admin/Role/Useredit',
+                            type: 'POST',
+                            data: fdata,
+                            dataType: 'json',
+                            async: true,
+                            success: function (data, status, xhr) {
+                                if (data.code == 200) {
+                                    layer.msg(data.result, {
+                                        icon: 1,
+                                        time: 2000
+                                    }, function () {
+                                        //关闭当前frame
+                                        xadmin.close();
+
+                                        // 可以对父窗口进行刷新
+                                        xadmin.father_reload();
+                                    });
+                                } else {
+                                    layer.msg(data.result, { icon: 2 });
+                                }
+                            },
+                            error: function () {
+                                layer.msg('出错了~', { icon: 2 });
+                            }
+                        });
+                        return false;
+                    });
+            });
+    </script>
+</body>

@@ -1,0 +1,108 @@
+﻿
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+    <body>
+        <div class="x-nav">
+            <span class="layui-breadcrumb">
+                <a>首页</a>
+                <a class="p_name"></a>
+                <a>
+                    <cite class="c_name"></cite>
+                </a>
+            </span>
+            <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" onclick="location.reload()" title="刷新">
+                <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i>
+            </a>
+        </div>
+        <div class="layui-fluid">
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-md12">
+                    <div class="layui-card" style="box-sizing:border-box;padding:10px;">
+                        <form class="layui-form">
+                            <div class="layui-form-item">
+                                <label for="username" class="layui-form-label">
+                                    <span class="x-red">*</span>中文标题
+                                </label>
+                                <div class="layui-input-block">
+                                    <input style="height:38px;" type="text" name="cn_title" value="@Model.cn_title" required lay-verify="required" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label for="username" class="layui-form-label">
+                                    <span class="x-red">*</span>英文标题
+                                </label>
+                                <div class="layui-input-block">
+                                    <input style="height:38px;" type="text" name="en_title" value="@Model.en_title" required lay-verify="required" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="editor-area">
+                                <div>
+                                    <script id="editor" type="text/plain">
+                                    </script>
+                                </div>
+                            </div>
+                            @Html.AntiForgeryToken()
+                            <button type="submit" style="margin: 20px auto 0;display:block" class="layui-btn layui-btn-lg" lay-filter="submit" id="submit" lay-submit="">立即提交</button>
+                            <div style="height:20px"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+            <script type="text/javascript" charset="utf-8" src="~/ueditor/ueditor.config.js"></script>
+            <script type="text/javascript" charset="utf-8" src="~/ueditor/ueditor.all.min.js"></script>
+            <script type="text/javascript" charset="utf-8" src="~/ueditor/lang/zh-cn/zh-cn.js"></script>
+            <script type="text/javascript">
+
+        //实例化编辑器
+        //建议使用工厂方法getEditor创建和引用编辑器实例，如果在某个闭包下引用该编辑器，直接调用UE.getEditor('editor')就能拿到相关的实例
+        var ue = UE.getEditor('editor', {
+            initialFrameWidth: 'auto',
+            initialFrameHeight: 600,
+            autoHeightEnabled: false,
+            autoFloatEnabled:false
+
+        });
+        ue.ready(function () {
+            ue.setContent('@Html.Raw(Model.content)')
+        })
+        layui.use(['form', 'layer'],
+            function () {
+                $ = layui.jquery;
+                var form = layui.form,
+                    layer = layui.layer;
+
+                //监听提交
+                form.on('submit(submit)',
+                    function (data) {
+                        var fdata = data.field;
+                        fdata["content"] = fdata.editorValue;
+                        fdata.editorValue = "";
+                        $.ajax({
+                            url: '/Admin/HomePage/EditAbout',
+                            type: 'POST',
+                            data: fdata,
+                            dataType: 'json',
+                            async: true,
+                            success: function (data, status, xhr) {
+                                if (data.code == 200) {
+                                    layer.msg(data.result, {
+                                        icon: 1,
+                                        time: 2000
+                                    });
+                                } else {
+                                    layer.msg(data.result, { icon: 2 });
+                                }
+                            },
+                            error: function () {
+                                layer.msg('出错了~', { icon: 2 });
+                            }
+                        });
+                        return false;
+                    });
+            });
+
+            </script>
+</body>

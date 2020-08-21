@@ -1,0 +1,88 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["title"] = Model.product.title;
+}
+@model DetailsViewModel
+@await Html.PartialAsync("_right_menu", @Model.common)
+<!-- right_menu end -->
+@await Html.PartialAsync("_header", @Model.common)
+<!-- header end -->
+    <div id="app">
+        <div class="main">
+            <div class="w1200 product_header">
+                <div class="img">
+                    <div class="swiper-container">
+                        <div class="swiper-wrapper">
+                            @if (Model.product.image != null)
+                            {
+                                @foreach (var i in Model.product.image)
+                                {
+                                    <div class="swiper-slide">
+                                        <img src="@i" class="">
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                    <!-- 大图 -->
+                </div>
+                <div class="text">
+                    <div class="b f36 col1a pb30">@Model.product.title</div>
+                    <div class="f18 col4c mb25">浏览次数：@(Model.product.people_number) 次</div>
+                    <div class="f18 col4c mb25">发布日期：@Model.product.addtime.ToString("yyyy-MM-dd HH:mm:ss")</div>
+
+                    <div class="page_swiper swiper-container">
+                        <div class="swiper-wrapper">
+                            @if (Model.product.image != null)
+                            {
+                                @foreach (var i in Model.product.image)
+                                {
+                                    <div class="swiper-slide">
+                                        <img src="@i">
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                    <!-- 小图 -->
+
+                    <a href="http://wpa.qq.com/msgrd?v=3&amp;uin=@(Model.product.qq)&amp;site=qq&amp;menu=yes" target="_blank" class="btnstyle2">我要咨询</a>
+                </div>
+            </div>
+            <!-- product_header end -->
+
+            <div class="w1200 pb60 mediapl">
+                <div class="title3">产品描述</div>
+                <div class="word ptb40">
+                    @Html.Raw(Model.product.content)
+                </div>
+                <div class="pages f16 lh2b ">
+                    @* 抱歉暂无数据 *@
+                    <a class="col4c dis" href="@(Model.prevproduct.id != 0 ? @Url.Action("details","Home",new { id = Model.prevproduct.id}) : "javascript:void(0);")">上一条：@(Model.prevproduct.id != 0 ? Model.prevproduct.title : "暂无数据")</a>
+                    <a class="col4c dis" href="@(Model.nextproduct.id != 0 ? @Url.Action("details","Home",new { id = Model.nextproduct.id}) : "javascript:void(0);")">下一条：@(Model.nextproduct.id != 0 ? Model.nextproduct.title : "暂无数据")</a>
+                </div>
+            </div>
+        </div>
+
+        @await Html.PartialAsync("_footer", @Model.common)
+        <!-- header end -->
+
+        <script type="text/javascript">
+            $(".header").addClass("style2");
+            $(".page_swiper .swiper-slide").eq(0).addClass("active").siblings().removeClass("active")
+            var mySwiper1 = new Swiper('.product_header .img .swiper-container', {
+                onTransitionEnd: function (e) {
+                    $(".page_swiper .swiper-slide").eq(e.activeIndex).addClass("active").siblings().removeClass("active");
+                    mySwiper.slideTo(e.activeIndex, 1000, false);
+                }
+            })
+            var mySwiper = new Swiper('.page_swiper', {
+                slidesPerView: 4,
+                spaceBetween: 9,
+                onTap: function (e) {
+                    $(".page_swiper .swiper-slide").eq(e.clickedIndex).addClass("active").siblings().removeClass("active");
+                    mySwiper1.slideTo(e.clickedIndex, 1000, false);
+                }
+            })
+        </script>
+    </div>

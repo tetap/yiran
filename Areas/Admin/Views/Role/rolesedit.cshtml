@@ -1,0 +1,189 @@
+﻿
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+<body>
+    @if (Model.code == 200)
+    {
+
+        <div class="layui-fluid">
+            <div class="layui-row">
+                <form action="" method="post" class="layui-form layui-form-pane">
+                    <input type="hidden" value="@Model.data.id" id="name" name="id" required="" lay-verify="required"
+                           autocomplete="off" class="layui-input">
+                    <div class="layui-form-item">
+                        <label for="name" class="layui-form-label">
+                            <span class="x-red">*</span>角色名
+                        </label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="name" value="@Model.data.name" name="name" required="" lay-verify="required"
+                                   autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item layui-form-text">
+                        <label class="layui-form-label">
+                            拥有权限
+                        </label>
+                        <table class="layui-table layui-input-block">
+                            <tbody>
+                                @using yiran.Areas.Admin.Models.Entity
+                                @{
+                                    string[] menu_id = { "-1" };
+                                    if (!string.IsNullOrEmpty(Model.data.menu_id))
+                                    {
+                                        menu_id = Model.data.menu_id.Split(",", StringSplitOptions.RemoveEmptyEntries);
+                                    }
+                                }
+                                @foreach (var m in (ViewData["menu"] as List<sys_menu>).Where(c => c.parent_id == 0).ToList())
+                                {
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" name="tid" @(Array.IndexOf(menu_id, @m.id.ToString()) != -1 ? "checked" : "") value="@m.id" lay-skin="primary" lay-filter="father" title="@m.name">
+                                        </td>
+                                        <td>
+                                            <div class="layui-input-block">
+                                                @foreach (var a in (ViewData["menu"] as List<sys_menu>).Where(c => c.parent_id == m.id).ToList())
+                                                {
+                                                    <fieldset class="layui-elem-field site-demo-button">
+                                                        <legend>
+                                                            <input name="tid" @(Array.IndexOf(menu_id, @a.id.ToString()) != -1 ? "checked" : "") lay-skin="primary" type="checkbox" lay-filter="nav" value="@a.id" title="@a.name">
+                                                            <div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>@a.name</span><i class="layui-icon layui-icon-ok"></i></div>
+                                                        </legend>
+                                                        <div class="layui-field-box">
+                                                            @foreach (var j in (ViewData["menu"] as List<sys_menu>).Where(c => c.parent_id == a.id).ToList())
+                                                            {
+                                                                <input name="tid" @(Array.IndexOf(menu_id, @j.id.ToString()) != -1 ? "checked" : "") lay-filter="next" data-cid="@a.id" lay-skin="primary" type="checkbox" value="@j.id" title="@j.name">
+                                                            }
+                                                        </div>
+                                                    </fieldset>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="layui-form-item layui-form-text">
+                        <label for="desc" class="layui-form-label">
+                            备注
+                        </label>
+                        <div class="layui-input-block">
+                            <textarea placeholder="请输入内容" id="desc" name="remark" class="layui-textarea">@Model.data.remark</textarea>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <button class="layui-btn" lay-submit="" lay-filter="add">修改</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script>
+        layui.use(['form', 'layer'], function () {
+            $ = layui.jquery;
+          var form = layui.form
+          ,layer = layui.layer;
+
+
+          form.on('submit(add)', function(data){
+              var d = data.field;
+              var cid = new  Array();
+
+              $("input[name^=tid]").each(function () {
+                  if ($(this).prop("checked")) {
+                        cid.push($(this).val());
+                  }
+              })
+              var subdata = {
+                  remark: d.remark,
+                  id: d.id,
+                  name: d.name,
+                  menu_id: cid.join(",")
+              }
+              $.ajax({
+				url:"@Url.Content("/Admin/Role/rolesedit")",
+				type:'POST',
+				data:subdata,
+				async:false,
+				dataType:'json', // 返回类型
+				success: function(data){
+                    if (data.code == 200) {
+                        layer.alert(data.result, { icon: 6 }, function () {
+                            // 获得frame索引
+                            var index = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(index);
+                            xadmin.father_reload();
+                        });
+                    } else {
+                        layer.msg(data.result);
+                    }
+				}
+			});
+            return false;
+          });
+
+
+        form.on('checkbox(father)', function(data){
+
+            if(data.elem.checked){
+                $(data.elem).parent().siblings('td').find('input').prop("checked", true);
+                form.render();
+            }else{
+               $(data.elem).parent().siblings('td').find('input').prop("checked", false);
+                form.render();
+            }
+        });
+
+            form.on('checkbox(nav)', function (data) {
+
+                if (data.elem.checked) {
+                    $(data.elem).parent().siblings('.layui-field-box').find('input').prop("checked", true);
+                    form.render();
+                } else {
+                    $(data.elem).parent().siblings('.layui-field-box').find('input').prop("checked", false);
+                    form.render();
+                }
+
+                check(form,data)
+
+        });
+
+            form.on('checkbox(next)', function (data) {
+            if (data.elem.checked) {
+                $(data.elem).prop("checked",true)
+                form.render();
+            } else {
+                $(data.elem).prop("checked",false)
+                form.render();
+            }
+            check(form,data)
+        });
+
+        });
+        function check(form,data) {
+            var nas = $(data.elem).parent(".layui-field-box").find("input:checked");
+            if (nas.length <= 0) {
+                //$(data.elem).parent(".layui-field-box").siblings("legend").find("input").prop("checked",false)
+                //form.render();
+            } else {
+                $(data.elem).parent(".layui-field-box").siblings("legend").find("input").prop("checked",true)
+                form.render();
+            }
+            var pas = $(data.elem).parents(".layui-elem-field").parent(".layui-input-block").find("input:checked");
+            if (pas.length <= 0) {
+                //$(data.elem).parents(".layui-elem-field").parent(".layui-input-block").parent("td").siblings("td").find("input[name *= tid]").prop("checked", false);
+                //form.render();
+            } else {
+                $(data.elem).parents(".layui-elem-field").parent(".layui-input-block").parent("td").siblings("td").find("input[name *= tid]").prop("checked", true);
+                form.render();
+            }
+        }
+        </script>
+    }
+    else
+    {
+        <script>alert("@Model.result");xadmin.father_reload();</script>
+    }
+</body>

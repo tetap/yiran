@@ -1,0 +1,99 @@
+﻿@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+<body>
+    <div class="layui-fluid">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-body ">
+                        <blockquote class="layui-elem-quote">
+                            欢迎管理员：
+                            <span class="x-red">@ViewBag.UserName</span><br />
+                            当前时间:
+                            <span class="x-red " id="current_time"></span>
+                        </blockquote>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-header">系统信息</div>
+                    <div class="layui-card-body ">
+                        <table class="layui-table">
+                            <tbody>
+                                <tr>
+                                    <th>操作系统</th>
+                                    <td>@ViewData["service"]</td>
+                                </tr>
+                                <tr>
+                                    <th>SDK版本</th>
+                                    <td>@ViewData["sdk"]</td>
+                                </tr>
+                                <tr>
+                                    <th>上传附件限制</th>
+                                    <td>@ViewData["UploadMax"]M</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-header">开发团队</div>
+                    <div class="layui-card-body ">
+                        <table class="layui-table">
+                            <tbody>
+                                <tr>
+                                    <th>版权所有</th>
+                                    <td>
+                                        依然
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>开发者</th>
+                                    <td>依然(239559238@qq.com)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <style id="welcome_style"></style>
+
+        </div>
+    </div>
+    <script>
+        run();
+        function run() {
+            var time = new Date();//获取系统当前时间
+            var year = time.getFullYear();
+            var month = time.getMonth() + 1;
+            var date = time.getDate();//系统时间月份中的日
+            var day = time.getDay();//系统时间中的星期值
+            var weeks = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+            var week = weeks[day];//显示为星期几
+            var hour = time.getHours();
+            var minutes = time.getMinutes();
+            var seconds = time.getSeconds();
+            if (month < 10) {
+                month = "0" + month;
+            }
+            if (date < 10) {
+                date = "0" + date;
+            }
+            if (hour < 10) {
+                hour = "0" + hour;
+            }
+            if (minutes < 10) {
+                minutes = "0" + minutes;
+            }
+            if (seconds < 10) {
+                seconds = "0" + seconds;
+            }
+            $('#current_time').text(year + "-" + month + "-" + date + " " + hour + ":" + minutes + ":" + seconds + ' ' + week);
+            setTimeout('run()', 1000);
+        }
+    </script>
+</body>

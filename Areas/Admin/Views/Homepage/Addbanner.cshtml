@@ -1,0 +1,169 @@
+﻿
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<body>
+    <style>
+
+    </style>
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <form class="layui-form" lay-filter="example">
+                <div class="layui-form-item">
+                    <label for="phone" class="layui-form-label">
+                        图片上传
+                    </label>
+                    <div class="layui-input-inline">
+                        <div class="layui-upload-drag" id="test10">
+                            <i class="layui-icon"></i>
+                            <p>点击上传，或将文件拖拽到此处</p>
+                            <div class="layui-hide" id="uploadDemoView">
+                                <hr>
+                                <img src="" alt="上传成功后渲染" style="max-width: 100%">
+                                <input type="hidden" name="image" value="" />
+                            </div>
+                        </div>
+                        <input style="height:38px;" type="hidden" name="image" autocomplete="off" class="layui-input">
+                    </div>
+                    <p class="x-red">尺寸:PC端 1920*825 手机端 750*500</p>
+                </div>
+                <div class="layui-form-item">
+                    <label for="username" class="layui-form-label">
+                        外链
+                    </label>
+                    <div class="layui-input-inline">
+                        <input style="height:38px;" type="text" name="href" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label for="phone" class="layui-form-label">
+                        排序
+                    </label>
+                    <div class="layui-input-inline">
+                        <input style="height:38px;" type="text" name="sork" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label for="username" class="layui-form-label">
+                        备注
+                    </label>
+                    <div class="layui-input-inline">
+                        <input style="height:38px;" type="text" name="remark" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label for="username" class="layui-form-label">
+                        客户端选择
+                    </label>
+                    <div class="layui-input-inline">
+                        <style>
+                            .layui-input.layui-unselect {
+                                height: 38px
+                            }
+                        </style>
+                        <select name="type" lay-verify="required">
+                            <option value=""></option>
+                            <option value="1" >PC端</option>
+                            <option value="2">手机端</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label for="username" class="layui-form-label">
+                        是否启用
+                    </label>
+                    <div class="layui-input-inline" style="line-height: 38px;">
+                        <input type="checkbox" checked name="Static" value="1" lay-skin="switch" lay-text="ON|OFF" lay-filter="switchTest">
+                    </div>
+
+                </div>
+                @Html.AntiForgeryToken();
+                <div class="layui-form-item">
+                    <label for="L_repass" class="layui-form-label">
+                    </label>
+                    <button class="layui-btn" lay-filter="add" lay-submit="">
+                        增加
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        layui.use(['form', 'layer','element','upload'],
+            function() {
+                $ = layui.jquery;
+                var form = layui.form,
+                    layer = layui.layer,
+                    upload = layui.upload;
+                //拖拽上传
+                  upload.render({
+                    elem: '#test10'
+                      , url: '/admin/homepage/UploadFile' //改成您自己的上传接口
+                    ,accept: 'images' //只允许上传图片
+                     ,acceptMime: 'image/*' //只筛选图片
+                          , done: function (res) {
+                              if (res.code == 200) {
+                                  layer.msg(res.result);
+                                  $("#uploadDemoView").removeClass("layui-hide").children("img").attr("src", res.data)
+                                  $("input[name=image]").val(res.data)
+                              }
+                      
+                        }
+                      });
+                form.on('switch(switchTest)', function(data){
+                    if (!this.checked) {
+                        layer.tips('关闭后前台将不展示本数据', data.othis)
+                    }
+                    var Static = this.checked ? '1' : '0';
+                    $("input[name=Static]").val(Static)
+                });
+                form.val('example', {
+                      "type": getUrlQuery("type")
+                });
+                //监听提交
+                form.on('submit(add)',
+                    function (data) {
+                    var dataf = data.field;
+                        if (!dataf["Static"]) {
+                            dataf["Static"] = 0;
+                        }
+                    $.ajax({
+                        url: '@Url.Action("AddBanner","HomePage",new { area="Admin"})',
+                        data: dataf,
+			            type: "post",
+			            async:true,
+			            dataType: 'json',
+                        success: function (data) {
+                            if (data.code == 200) {
+                                //发异步，把数据提交给php
+                                layer.alert(data.result, {
+                                    icon: 6
+                                },
+                                function() {
+                                    //关闭当前frame
+                                    xadmin.close();
+                                    // 可以对父窗口进行刷新
+                                    xadmin.father_reload();
+                                });
+                            } else {
+                                 layer.msg(data.result, { icon: 0, time: 2000 });
+                            }
+                        },
+			            error:function(xhr,errorText,errorType){
+                             alert("error");
+                        },
+			            complete : function(XMLHttpRequest,status){ //请求完成后最终执行参数
+				            if(status=='timeout'){
+					            ajax.abort();
+					            alert("请求超时");
+				            }
+			            }
+		            })
+
+                    return false;
+                });
+
+            });
+    </script>
+</body>

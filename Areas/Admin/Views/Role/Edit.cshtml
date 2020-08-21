@@ -1,0 +1,130 @@
+﻿
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<body>
+    @if (Model.code == 200)
+    {
+
+        <div class="layui-fluid">
+            <div class="layui-row">
+                <form class="layui-form">
+                    <div class="layui-form-item">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" id="id" value="@Model.data.id" name="id" required="" lay-verify="required"
+                               autocomplete="off" class="layui-input">
+                        <input type="hidden" id="id" value="@Model.data.parent_id" name="parent_id" required="" lay-verify="required"
+                               autocomplete="off" class="layui-input">
+                        <label for="username" class="layui-form-label">
+                            <span class="x-red">*</span>分类名
+                        </label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="username" name="name" value="@Model.data.name" required="" lay-verify="required"
+                                   autocomplete="off" class="layui-input">
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">
+                            <span class="x-red">*</span>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label for="username" class="layui-form-label">
+                            <span class="x-red">*</span>规则
+                        </label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="username" name="path" value="@Model.data.path" required="" lay-verify="required"
+                                   autocomplete="off" class="layui-input">
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">
+                            <span class="x-red">*不要乱改更改规则！！！</span>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label for="username" class="layui-form-label">
+                            <span class="x-red"></span>排序
+                        </label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="username" name="sork" value="@Model.data.sork" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"
+                                   autocomplete="off" class="layui-input">
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">
+                            <span class="x-red"></span>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label for="username" class="layui-form-label">
+                            <span class="x-red"></span>操作
+                        </label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="username" name="action" value="@Model.data.action" autocomplete="off" class="layui-input" />
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label for="username" class="layui-form-label">
+                            <span class="x-red"></span>备注
+                        </label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="username" name="remark" value="@Model.data.remark"
+                                   autocomplete="off" class="layui-input">
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label for="L_repass" class="layui-form-label">
+                        </label>
+                        <button class="layui-btn" lay-filter="add" lay-submit="">
+                            修改
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script>
+    layui.use(['form', 'layer'],
+                function () {
+                    $ = layui.jquery;
+                    var form = layui.form,
+                        layer = layui.layer;
+
+                    //监听提交
+                    form.on('submit(add)',
+                        function (data) {
+                                $.ajax({
+                                    url: '/Admin/Role/EditCategrory',
+				                    type: 'POST',
+				                    data: data.field,
+				                    dataType: 'json',
+				                    async: true,
+                                    success: function(data, status, xhr) {
+                                            if (data.code == 200) {
+                                                layer.msg(data.result, {
+                                                icon: 1,
+                                                time: 2000
+                                                }, function(){
+                                                    //关闭当前frame
+                                                    xadmin.close();
+
+                                                    // 可以对父窗口进行刷新
+                                                    xadmin.father_reload();
+                                                });
+                                            } else {
+                                                layer.msg(data.result, { icon: 2 });
+                                            }
+                                        },
+                                    error: function() {
+                                            layer.msg('出错了~', { icon: 2 });
+                                        }
+                                });
+                            return false;
+                        });
+             });
+        </script>
+    }
+    else
+    {
+        <script>alert("@Model.result");xadmin.father_reload();</script>
+    }
+</body>

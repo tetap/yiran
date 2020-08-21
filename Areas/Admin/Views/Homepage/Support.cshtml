@@ -1,0 +1,456 @@
+﻿
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@using yiran.Models.Entity
+@using yiran.Areas.Admin.Models.Entity
+@using yiran.Areas.Admin.Models.Request
+@model PageRequestModel
+<body>
+    <div class="x-nav">
+        <span class="layui-breadcrumb">
+            <a>首页</a>
+            <a class="p_name"></a>
+            <a>
+                <cite class="c_name"></cite>
+            </a>
+        </span>
+        <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" onclick="location.reload()" title="刷新">
+            <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i>
+        </a>
+    </div>
+    <div class="layui-fluid">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-body layui-table-body layui-table-main">
+                        <div class="layui-tab layui-tab-card">
+                            <ul class="layui-tab-title">
+                                <li class="layui-this ">内容列表</li>
+                                <li>标题</li>
+                            </ul>
+                            <div class="layui-tab-content">
+                                <div class="layui-tab-item layui-show">
+                                    <div class="layui-card-body " style="padding-left:0">
+                                        <form class="layui-form layui-col-space5">
+                                            <div class="layui-inline layui-show-xs-block">
+                                                <input class="layui-input" autocomplete="off" placeholder="开始日期" name="start" id="start">
+                                            </div>
+                                            <div class="layui-inline layui-show-xs-block">
+                                                <input class="layui-input" autocomplete="off" placeholder="截止日期" name="end" id="end">
+                                            </div>
+                                            <div class="layui-inline layui-show-xs-block">
+                                                <input type="text" name="keywork" placeholder="标题" autocomplete="off" class="layui-input">
+                                            </div>
+                                            <div class="layui-inline layui-show-xs-block">
+                                                <button class="layui-btn" lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="layui-card-header" style="padding-bottom:10px;margin-bottom:15px;padding-left:0">
+                                        @if ((ViewData["menu"] as List<sys_menu>).Where(c => c.action == "delsupport").Any())
+                                        {
+                                            <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除</button>
+                                        }
+                                        @if ((ViewData["menu"] as List<sys_menu>).Where(c => c.action == "addsupport").Any())
+                                        {
+                                            <button class="layui-btn" onclick="xadmin.open('添加技术支持','/Admin/HomePage/addsupport',700,700)"><i class="layui-icon"></i>添加</button>
+                                        }
+                                    </div>
+                                    <div style="overflow-x:auto;width:100%">
+                                        <table class="layui-table layui-form">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        <input title="全选" type="checkbox" lay-filter="checkall" name="" lay-skin="primary">
+                                                    </th>
+                                                    <th>图片</th>
+                                                    <th>标题</th>
+                                                    <th>内容</th>
+                                                    <th>添加时间</th>
+                                                    <th>备注</th>
+                                                    <th>排序</th>
+                                                    <th>状态</th>
+                                                    <th>操作</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+
+                                                @if (Model.data.Count >= 1)
+                                                {
+                                                    var i = 0;
+                                                    foreach (var m in Model.data)
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <input type="checkbox" name="id" title="@(i = i + 1)" value="@m.id" lay-skin="primary">
+                                                            </td>
+                                                            <td><img class="showImg" style="cursor:pointer;display:block;margin:auto;max-width:220px" src="@m.icon" /></td>
+                                                            <td>@m.title</td>
+                                                            <td>@m.content</td>
+                                                            <td>@m.addtime.ToString("yyyy/MM/dd HH:mm:ss")</td>
+                                                            <td>@m.remark</td>
+                                                            <td>
+                                                                <input @((ViewData["menu"] as List<sys_menu>).Where(c => c.action == "editsupport").Any() ? "" : "disabled") onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" type="text" value="@m.sork" data-value="@m.sork" data-id="@m.id" onblur="setSork(this)" id="sork" name="sork" required="" lay-verify="required" autocomplete="off" class="layui-input" />
+                                                                <p class="x-red">数值越大越靠前</p>
+                                                            </td>
+                                                            <td align="center" data-id="@m.id">
+                                                                <input type="checkbox" @((ViewData["menu"] as List<sys_menu>).Where(c => c.action == "editsupport").Any() ? "" : "disabled") data-id="@m.id" @(m.Static == 1 ? "checked" : "") name="Static" value="@m.Static" lay-skin="switch" lay-text="ON|OFF" lay-filter="switchTest">
+                                                            </td>
+                                                            <td class="td-manage">
+                                                                @if ((ViewData["menu"] as List<sys_menu>).Where(c => c.action == "editsupport").Any())
+                                                                {
+                                                                    <a title="编辑" onclick="xadmin.open('编辑','@Url.Action("Editsupport", "HomePage", new { area = "Admin", id = @m.id })',700,700)" href="javascript:;">
+                                                                        <i class="layui-icon">&#xe642;</i>
+                                                                    </a>
+                                                                }
+                                                                @if ((ViewData["menu"] as List<sys_menu>).Where(c => c.action == "delsupport").Any())
+                                                                {
+                                                                    <a title="删除" onclick="member_del(this,'@m.id')" href="javascript:;">
+                                                                        <i class="layui-icon">&#xe640;</i>
+                                                                    </a>
+                                                                }
+
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <tr>
+                                                        <td colspan="9" align="center">暂无数据</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                        <div class="layui-card-body ">
+                                        <div class="page">
+                                            <style>
+                                                .pagination {
+                                                    font-size: 0;
+                                                    margin-bottom: 25px;
+                                                }
+
+                                                    .pagination .click {
+                                                        cursor: pointer
+                                                    }
+
+                                                    .pagination a {
+                                                        text-decoration: none;
+                                                        border: 1px solid #009688;
+                                                        color: #009688;
+                                                        font-size: 13px;
+                                                        border-radius: 2px;
+                                                        margin: 0 4px;
+                                                    }
+
+                                                    .pagination span {
+                                                        color: #666;
+                                                        font-size: 13px;
+                                                        display: inline-block;
+                                                        border: 1px solid #ccc;
+                                                        padding: 0.2em 0.6em;
+                                                        margin: 0 4px;
+                                                    }
+
+                                                        .pagination span.pagetext {
+                                                            border: none
+                                                        }
+
+                                                    .pagination a:hover {
+                                                        background: #009688;
+                                                        color: #fff;
+                                                    }
+
+                                                    .pagination a {
+                                                        display: inline-block;
+                                                        padding: 0.2em 0.6em;
+                                                    }
+
+                                                    .pagination .page_current {
+                                                        background: #009688;
+                                                        color: #fff;
+                                                        border: 1px solid #009688;
+                                                        margin-right: 5px;
+                                                    }
+
+                                                .pagination {
+                                                    margin-top: 20px;
+                                                }
+
+                                                    .pagination .current.prev, .pagination .current.next {
+                                                        color: #999;
+                                                        border-color: #999;
+                                                        background: #fff;
+                                                    }
+                                            </style>
+                                            @Html.Raw(ViewData["page"])
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="layui-tab-item">
+                                    <form class="layui-form">
+                                        <div class="layui-form-item">
+                                            <label for="username" class="layui-form-label">
+                                                <span class="x-red">*</span>中文标题
+                                            </label>
+                                            <div class="layui-input-inline">
+                                                <input type="text" @((ViewData["menu"] as List<sys_menu>).Where(c => c.action == "editsupport").Any() ? "" : "disabled")  id="username" name="cn_title" value="@((ViewData["support"] as yr_support).cn_title)" required="" lay-verify="required"
+                                                       autocomplete="off" class="layui-input">
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label for="username" class="layui-form-label">
+                                                <span class="x-red">*</span>英文标题
+                                            </label>
+                                            <div class="layui-input-inline">
+                                                <input type="text" id="username" @((ViewData["menu"] as List<sys_menu>).Where(c => c.action == "editsupport").Any() ? "" : "disabled") name="en_title" value="@((ViewData["support"] as yr_support).en_title)" required="" lay-verify="required"
+                                                       autocomplete="off" class="layui-input">
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label for="L_repass" class="layui-form-label">
+                                            </label>
+                                            <button class="layui-btn" lay-filter="add" lay-submit="">
+                                                修改
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="layui-card-body ">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    layui.use(['laydate', 'form','element'], function () {
+        var laydate = layui.laydate;
+        var form = layui.form;
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#start' //指定元素
+            ,value:getUrlQuery("start") ? getUrlQuery("start")  : ""
+        });
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#end' //指定元素
+            ,value:getUrlQuery("end") ? getUrlQuery("end")  : ""
+        });
+        $("input[name=keywork]").val(getUrlQuery("keywork") ? getUrlQuery("keywork") : "");
+
+
+         @if ((ViewData["menu"] as List<sys_menu>).Where(c => c.action == "editsupport").Any())
+         {
+              <text>
+                //监听提交
+                form.on('submit(add)',
+                    function (data) {
+                        $.ajax({
+                            url: '/Admin/HomePage/UpdateSupport',
+                            type: 'POST',
+                            data: data.field,
+                            dataType: 'json',
+                            async: true,
+                            success: function (data, status, xhr) {
+                                if (data.code == 200) {
+                                    layer.msg(data.result, {
+                                        icon: 1,
+                                        time: 2000
+                                    });
+                                } else {
+                                    layer.msg(data.result, { icon: 2 });
+                                }
+                            },
+                            error: function () {
+                                layer.msg('出错了~', { icon: 2 });
+                            }
+                        });
+                        return false;
+                    });
+
+
+
+             form.on('switch(switchTest)', function(data){
+             if (!this.checked) {
+                     layer.tips('关闭后前台将不展示本数据', data.othis)
+             }
+                 var Static = this.checked ? '1' : '0';
+                 $("input[name=Static]").val(Static)
+                 $.ajax({
+                 url: '@Url.Action("StaticSupport","HomePage",new { area="Admin"})',
+                data: {id:$(data.othis).siblings("input").attr("data-id"),Static:Static},
+			            type: "post",
+			            async:true,
+			            dataType: 'json',
+                        success: function (data) {
+                         if (data.code == 200) {
+                             //发异步，把数据提交给php
+                             layer.alert(data.result, {
+                             icon: 6
+                                });
+                         } else {
+                             layer.msg(data.result, { icon: 0, time: 2000 });
+                         }
+                     },
+			            error:function(xhr,errorText,errorType){
+                         alert("error");
+                     },
+			            complete : function(XMLHttpRequest,status){ //请求完成后最终执行参数
+                         if(status=='timeout'){
+                             ajax.abort();
+                             alert("请求超时");
+                         }
+                     }
+                 })
+        });
+            </text>
+         }
+
+
+        // 监听全选
+        form.on('checkbox(checkall)', function(data){
+          if(data.elem.checked){
+            $('.layui-show tbody input[name = id]').prop('checked',true);
+          }else{
+            $('.layui-show tbody input[name = id]').prop('checked',false);
+          }
+          form.render('checkbox');
+        });
+
+    });
+
+    @if ((ViewData["menu"] as List<sys_menu>).Where(c => c.action == "delsupport").Any())
+    {
+        <text>
+            /*用户-删除*/
+            function member_del(obj,id){
+                  layer.confirm('确认要删除吗？',function(index){
+                      //发异步删除数据
+                      $.ajax({
+                        url: '@Url.Content("/Admin/Homepage/Delsupport")',
+                        type: 'POST',
+                        data: { id: id},
+                        dataType: 'json',
+                        async: true,
+                        success: function (data, status, xhr) {
+                            if (data.code == 200) {
+                                layer.msg(data.result, {
+                                    icon: 1,
+                                    time: 2000
+                                }, function(){
+                                    location.reload();
+                                });
+                            } else {
+                                layer.msg(data.result, { icon: 2 });
+                            }
+                        }
+			          });
+                      //$(obj).parents("tr").remove();
+                      //layer.msg('已删除!',{icon:1,time:1000});
+                  });
+    }
+    function delAll (argument) {
+        var ids = [];
+
+        // 获取选中的id
+        $('.layui-show tbody input[name = id]').each(function(index, el) {
+            if($(this).prop('checked')){
+                ids.push($(this).val())
+            }
+
+        });
+         if (ids.length @Html.Raw("<")= 0) {
+             layer.msg("请选择要删除的行", { icon: 2, time: 2000 });
+             return false;
+         }
+         layer.confirm('确认要删除吗？', function (index) {
+             $.ajax({
+                 url: '@Url.Content("/Admin/Homepage/Delsupport")',
+                 type: 'POST',
+                 data: { id:ids },
+				dataType: 'json',
+				async: true,
+                success: function (data, status, xhr) {
+                    if (data.code == 200) {
+                        layer.msg(data.result, {
+                            icon: 1,
+                            time: 2000
+                        }, function(){
+                            location.reload();
+                        });
+                    } else {
+                        layer.msg(data.result, { icon: 2 });
+                    }
+				}
+			});
+        });
+    }
+        </text>
+    }
+
+    $(".showImg").click(function () {
+        var content = '<div style="height: 100%; overflow: hidden !important;">' +
+			'<img src="' + $(this).attr("src") + ' "  />' +
+		 '</div>';
+        layer.open({
+		    type: 1,
+		    title: false,
+		    shadeClose: true,
+			closeBtn: 0,
+		    area: 'auto', //宽高
+		    content: content
+		});
+    })
+     @if ((ViewData["menu"] as List<sys_menu>).Where(c => c.action == "editsupport").Any()) {
+        <text>
+        function setSork(obj) {
+        var sork = $(obj).val();
+        var id = $(obj).attr("data-id")
+        if (sork != $(obj).attr("data-value")) {
+            layer.confirm('是否更改排序？', function (index) {
+                var data = {
+                    id: id,
+                    sork: sork
+                }
+                $.ajax({
+					url:'@Url.Content("/Admin/Homepage/Sorksupport")',
+					type: 'POST',
+					data: data,
+					dataType: 'json',
+					async: true,
+                    success: function (data, status, xhr) {
+                        if (data.code == 200) {
+                            layer.msg(data.result, {
+                                icon: 1,
+                                time: 2000
+                            }, function(){
+                                location.reload();
+                            });
+                        } else {
+                            layer.msg(data.result, { icon: 2 });
+                        }
+					}
+				});
+
+            }, function () {
+                $(obj).val($(obj).attr("data-value"));
+            });
+        }
+    }
+    </text>
+     }
+
+
+
+</script>

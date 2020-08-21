@@ -1,0 +1,212 @@
+﻿
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@using yiran.Models.Entity
+@model  yr_common
+
+<body>
+    <style>
+        .layui-form-item .layui-input-inline {
+            min-width:190px;
+            width:auto
+        }
+    </style>
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <form class="layui-form" lay-filter="example">
+                <div class="layui-form-item">
+                    <label for="phone" class="layui-form-label">
+                        <span class="x-red">*</span>
+                        LOGO
+                    </label>
+                    <div class="layui-input-inline">
+                        <div class="layui-upload-drag" id="test10">
+                            <i class="layui-icon"></i>
+                            <p>点击上传，或将文件拖拽到此处</p>
+                            <div id="uploadDemoView1">
+                                <hr>
+                                <img src="@Model.logo" alt="上传成功后渲染" style="max-width: 196px">
+                            </div>
+                        </div>
+                        <input style="height:38px;" type="hidden" value="@Model.logo" name="logo" required lay-verify="required" autocomplete="off" class="layui-input">
+                    </div>
+                    <p class="x-red">尺寸:356*29</p>
+                </div>
+                <div class="layui-form-item">
+                    <label for="username" class="layui-form-label">
+                        <span class="x-red">*</span>
+                        联系电话
+                    </label>
+                    <div class="layui-input-inline">
+                        <input style="height:38px;" type="text" value="@Model.phone" name="phone" required lay-verify="required" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label for="phone" class="layui-form-label">
+                        <span class="x-red">*</span>
+                        联系qq
+                    </label>
+                    <div class="layui-input-inline">
+                        <input style="height:38px;" type="text" value="@Model.qq" name="qq" required lay-verify="required" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label for="phone" class="layui-form-label">
+                        <span class="x-red">*</span>
+                        微信
+                    </label>
+                    <div class="layui-input-inline">
+                        <div class="layui-upload-drag" id="test11">
+                            <i class="layui-icon"></i>
+                            <p>点击上传，或将文件拖拽到此处</p>
+                            <div id="uploadDemoView2">
+                                <hr>
+                                <img src="@Model.wechat" alt="上传成功后渲染" style="max-width: 196px">
+                            </div>
+                        </div>
+                        <input style="height:38px;" type="hidden" value="@Model.wechat" name="wechat" required lay-verify="required" autocomplete="off" class="layui-input">
+                    </div>
+                    <p class="x-red">尺寸:151*151</p>
+                </div>
+                <div class="layui-form-item">
+                    <label for="username" class="layui-form-label">
+                        <span class="x-red">*</span>
+                        版权信息
+                    </label>
+                    <div class="layui-input-inline">
+                        <input style="height:38px;" type="text" value="@Model.copy" name="copy" required lay-verify="required" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label for="username" class="layui-form-label">
+                        <span class="x-red">*</span>
+                        备案信息
+                    </label>
+                    <div class="layui-input-inline">
+                        <input style="height:38px;" type="text" value="@Model.beian" name="beian" required lay-verify="required" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label for="username" class="layui-form-label">
+                        备注
+                    </label>
+                    <div class="layui-input-inline">
+                        <input style="height:38px;" type="text" value="@Model.remark" name="remark" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label for="username" class="layui-form-label">
+                        网站标题
+                    </label>
+                    <div class="layui-input-inline">
+                        <input style="height:38px;" type="text" value="@Model.title" name="title" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label for="username" class="layui-form-label">
+                        description
+                    </label>
+                    <div class="layui-input-inline">
+                        <input style="height:38px;" type="text" value="@Model.description" name="description" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label for="username" class="layui-form-label">
+                        keywords
+                    </label>
+                    <div class="layui-input-inline">
+                        <input style="height:38px;" type="text" value="@Model.keywords" name="keywords" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                @Html.AntiForgeryToken();
+                <div class="layui-form-item">
+                    <label for="L_repass" class="layui-form-label">
+                    </label>
+                    <button class="layui-btn layui-btn-lg" lay-filter="add" lay-submit="">
+                        修改
+                    </button>
+                </div>
+                <div class="layui-form-item">
+                    <label for="L_repass" class="layui-form-label">
+                    </label>
+                    <p class="x-red" style="margin-top:20px;display:block">更新时间：@Model.update_time.ToString("yyyy/MM/dd HH:mm:ss")</p>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        layui.use(['form', 'layer','element','upload'],
+            function() {
+                $ = layui.jquery;
+                var form = layui.form,
+                    layer = layui.layer,
+                    upload = layui.upload;
+                //拖拽上传
+                  upload.render({
+                    elem: '#test10'
+                      , url: '/admin/homepage/UploadFile' //改成您自己的上传接口
+                    ,accept: 'images' //只允许上传图片
+                     ,acceptMime: 'image/*' //只筛选图片
+                          , done: function (res) {
+                              if (res.code == 200) {
+                                  layer.msg(res.result);
+                                  $("#uploadDemoView1").removeClass("layui-hide").children("img").attr("src", res.data)
+                                  $("input[name=logo]").val(res.data)
+                              }
+
+                        }
+                  });
+                //拖拽上传
+                  upload.render({
+                    elem: '#test11'
+                      , url: '/admin/homepage/UploadFile' //改成您自己的上传接口
+                    ,accept: 'images' //只允许上传图片
+                     ,acceptMime: 'image/*' //只筛选图片
+                          , done: function (res) {
+                              if (res.code == 200) {
+                                  layer.msg(res.result);
+                                  $("#uploadDemoView2").removeClass("layui-hide").children("img").attr("src", res.data)
+                                  $("input[name=wechat]").val(res.data)
+                              }
+
+                        }
+                      });
+                //监听提交
+                form.on('submit(add)',
+                    function (data) {
+                    $.ajax({
+                        url: '@Url.Action("Index","Web",new { area="Admin"})',
+                        data: data.field,
+			            type: "post",
+			            async:true,
+			            dataType: 'json',
+                        success: function (data) {
+                            if (data.code == 200) {
+                                //发异步，把数据提交给php
+                                layer.alert(data.result, {
+                                    icon: 6
+                                }, function () {
+                                        location.reload();
+                                });
+                            } else {
+                                 layer.msg(data.result, { icon: 0, time: 2000 });
+                            }
+                        },
+			            error:function(xhr,errorText,errorType){
+                             alert("error");
+                        },
+			            complete : function(XMLHttpRequest,status){ //请求完成后最终执行参数
+				            if(status=='timeout'){
+					            ajax.abort();
+					            alert("请求超时");
+				            }
+			            }
+		            })
+
+                    return false;
+                });
+
+            });
+    </script>
+</body>

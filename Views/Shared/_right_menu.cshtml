@@ -1,0 +1,37 @@
+﻿<div class="right_menu">
+    <a href="javascript:void(0);" onclick="gotop()">
+        <div class="right_menu_btn">
+            <div class="icon">
+                <img src="images/icon1.png">
+            </div>
+            <div class="text">返回顶部</div>
+        </div>
+    </a>
+    <a href="tel:@Model.phone">
+        <div class="right_menu_btn">
+            <div class="icon">
+                <img src="images/icon2.png">
+            </div>
+            <div class="text">@Model.phone</div>
+        </div>
+    </a>
+    <a href="http://wpa.qq.com/msgrd?v=3&amp;uin=@(Model.qq)&amp;site=qq&amp;menu=yes" target="_blank">
+        <div class="right_menu_btn">
+            <div class="icon">
+                <img src="images/icon3.png">
+            </div>
+            <div class="text">QQ客服</div>
+        </div>
+    </a>
+    <a href="javascript:void(0);" onclick="gotop()">
+        <div class="right_menu_btn">
+            <div class="icon">
+                <img src="images/icon4.png">
+            </div>
+            <div class="text">微信二维码</div>
+        </div>
+        <div class="codeImg guodu">
+            <img src="@Model.wechat">
+        </div>
+    </a>
+</div>
